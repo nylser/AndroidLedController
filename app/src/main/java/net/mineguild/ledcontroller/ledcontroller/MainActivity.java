@@ -5,11 +5,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.os.Build;
-import android.os.Handler;
+import android.os.Bundle;
+import android.support.v4.app.RemoteInput;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -35,11 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private WSClient getClient;
     private WSClient setClient;
 
-    private Handler colorHandler;
     private int noChange = 0;
 
     int mNotificationId;
     Notification.Builder mBuilder;
+    Intent mIntent;
 
     public static final String UUID_KEY = "uuid";
     public static final String COLOR_KEY = "lColor";
@@ -88,9 +89,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mBuilder = new Notification.Builder(this).setSmallIcon(R.drawable.icon_small).setContentTitle("LedController").setContentText("Control your leds!");
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent endIntent = PendingIntent.getActivity(this, 1, mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         mBuilder.setContentIntent(pendingIntent);
+        //Notification.Action action = new Notification.Action.Builder(R.drawable.ic_menu_send, "Switch off", endIntent).addExtras(Bundle.EMPTY).build();
+        //mBuilder.addAction(action);
         mNotificationId = 001;
 
         openWebsockets();
@@ -109,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
+        //System.out.println(RemoteInput.getResultsFromIntent(mIntent));
     }
 
     @Override
@@ -122,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void openWebsockets() {
         try {
-            System.out.println("Connecting...");
+            //System.out.println("Connecting...");
             getClient = new WSClient(new URI("ws://alarmpi:8765/get"), new Draft_17(), WSClient.GET_PROTOCOL, this);
             setClient = new WSClient(new URI("ws://alarmpi:8765/set"), new Draft_17(), WSClient.SET_PROTOCOL, this);
             setClient.connect();
@@ -135,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         uuid = UUID.fromString(savedInstanceState.getString(UUID_KEY));
-        mTop.setColor(savedInstanceState.getInt(COLOR_KEY));
+        //mTop.setColor(savedInstanceState.getInt(COLOR_KEY));
     }
 
     // invoked when the activity may be temporarily destroyed, save the instance state here
@@ -150,14 +156,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void switchOff() {
-        mBottom.setZero();
+        mTop.setZero();
     }
 
     public void setColor(int color) {
         noChange++;
         mTop.setColor(color);
-        noChange++;
-        mBottom.setColor(color);
     }
 
     public String getUUID() {

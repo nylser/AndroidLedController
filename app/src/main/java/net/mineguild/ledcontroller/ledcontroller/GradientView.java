@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -309,7 +310,11 @@ public class GradientView extends View {
 
     protected void dispatchColorChanged(int color) {
         if (mBrightnessGradientView != null) {
-            mBrightnessGradientView.setColor(color, false);
+            /*Log.d("Colors", "BrightnessGradient");
+            float hsv[] = new float[3];
+            Color.colorToHSV(color, hsv);
+            Log.d("ColorsBrightness", Float.toString(hsv[2]));*/
+            mBrightnessGradientView.setColor(color, true);
         }
         if (mOnColorChangedListener != null) {
             mOnColorChangedListener.onColorChanged(this, color);
@@ -360,9 +365,9 @@ public class GradientView extends View {
             mSelectedColorGradient[0] = getColorForGradient(mHSV);
             mSelectedColor = Color.HSVToColor(mHSV);
             buildShaders();
-            if (mLastX != Integer.MIN_VALUE) {
+            /*if (mLastX != Integer.MIN_VALUE) {
                 mHSV[2] = pointToValueBrightness(mLastX);
-            }
+            }*/
             selectedColor = Color.HSVToColor(mHSV);
         }
         if (updatePointers) {
