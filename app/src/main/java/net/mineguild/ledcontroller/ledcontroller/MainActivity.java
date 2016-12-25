@@ -102,8 +102,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
-        getClient.close();
-        setClient.close();
     }
 
     @Override
@@ -118,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
+        setClient.close();
+        getClient.close();
     }
 
     private void openWebsockets() {
