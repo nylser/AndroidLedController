@@ -1,6 +1,7 @@
 package net.mineguild.ledcontroller.ledcontroller;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Looper;
 import android.util.JsonReader;
 
@@ -26,7 +27,7 @@ public class WSClient extends WebSocketClient {
     private int protocol;
     private MainActivity act;
 
-    WSClient(URI serverURI, Draft draft, int protocol, MainActivity act){
+    WSClient(URI serverURI, Draft draft, int protocol, MainActivity act) {
         super(serverURI, draft);
         this.protocol = protocol;
         this.act = act;
@@ -40,18 +41,20 @@ public class WSClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        if(protocol == GET_PROTOCOL){
+        if (protocol == GET_PROTOCOL) {
             try {
                 JSONObject json = new JSONObject(message);
                 JSONArray colors = json.getJSONArray("color");
-                final String hex = String.format("%02x%02x%02x", colors.get(0), colors.get(1), colors.get(2));
+                final int color = Color.argb(255, colors.getInt(0), colors.getInt(1), colors.getInt(2));
                 act.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        act.setColor(Integer.parseInt(hex, 16));
+
+                        act.setColor(color);
+
                     }
                 });
-            } catch (JSONException e){
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
