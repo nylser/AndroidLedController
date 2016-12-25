@@ -161,7 +161,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void setColor(int color) {
         noChange++;
-        mTop.setColor(color);
+        // External call, with updating pointers
+        mTop.setColor(color, true, false);
     }
 
     public String getUUID() {

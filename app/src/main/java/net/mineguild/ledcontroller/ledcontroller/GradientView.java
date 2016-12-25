@@ -304,17 +304,17 @@ public class GradientView extends View {
             mHSV[2] = 1f;
             mSelectedColor = Color.HSVToColor(mHSV);
         }
-        dispatchColorChanged(mSelectedColor);
+        dispatchColorChanged(mSelectedColor, true);
         String color = Integer.toHexString(mSelectedColor);
     }
 
-    protected void dispatchColorChanged(int color) {
+    protected void dispatchColorChanged(int color, boolean isInternal) {
         if (mBrightnessGradientView != null) {
             /*Log.d("Colors", "BrightnessGradient");
             float hsv[] = new float[3];
             Color.colorToHSV(color, hsv);
             Log.d("ColorsBrightness", Float.toString(hsv[2]));*/
-            mBrightnessGradientView.setColor(color, true);
+            mBrightnessGradientView.setColor(color, true, isInternal);
         }
         if (mOnColorChangedListener != null) {
             mOnColorChangedListener.onColorChanged(this, color);
@@ -356,18 +356,22 @@ public class GradientView extends View {
         mSelectedColor = Color.HSVToColor(mHSV);
         updatePointerPosition();
         invalidate();
-        dispatchColorChanged(mSelectedColor);
+        dispatchColorChanged(mSelectedColor, false);
     }
 
-    protected void setColor(int selectedColor, boolean updatePointers) {
+    protected void setColor(int selectedColor, boolean updatePointers){
+        setColor(selectedColor, updatePointers, true);
+    }
+
+    protected void setColor(int selectedColor, boolean updatePointers, boolean isInternal) {
         Color.colorToHSV(selectedColor, mHSV);
         if (mIsBrightnessGradient) {
             mSelectedColorGradient[0] = getColorForGradient(mHSV);
             mSelectedColor = Color.HSVToColor(mHSV);
             buildShaders();
-            /*if (mLastX != Integer.MIN_VALUE) {
+            if (mLastX != Integer.MIN_VALUE && isInternal) {
                 mHSV[2] = pointToValueBrightness(mLastX);
-            }*/
+            }
             selectedColor = Color.HSVToColor(mHSV);
         }
         if (updatePointers) {
@@ -375,7 +379,7 @@ public class GradientView extends View {
         }
         mSelectedColor = selectedColor;
         invalidate();
-        dispatchColorChanged(mSelectedColor);
+        dispatchColorChanged(mSelectedColor, isInternal);
     }
 
     /**
